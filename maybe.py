@@ -3,7 +3,8 @@ from functools import singledispatch, singledispatchmethod
 
 
 class Maybe:
-    pass
+    def __eq__(self, x):
+        raise TypeError("Use with other types of Maybe")
 
 
 class Just(Maybe):
@@ -14,16 +15,8 @@ class Just(Maybe):
         return f"Just {self.value}"
 
     @singledispatchmethod
-    def __eq__(self, x):
-        raise TypeError("Use with other types of Maybe")
-
-    @__eq__.register
-    def _(self, other: None) -> bool:
-        return False
-
-    @__eq__.register
-    def _(self, x: Maybe) -> bool:
-        return self.value == x.value
+    def __eq__(self, other):
+        raise TypeError("Use with Maybe objects")
 
 
 class Nothing(Maybe):
@@ -32,15 +25,29 @@ class Nothing(Maybe):
 
     @singledispatchmethod
     def __eq__(self, x):
-        raise TypeError("Use with other types of Maybe")
+        raise TypeError("Use with Maybe objects")
 
-    @__eq__.register
-    def _(self, other: Just) -> bool:
-        return False
 
-    @__eq__.register
-    def _(self, x: Maybe) -> bool:
-        return True
+@Just.__eq__.register
+def _(self, other: Just) -> bool:
+    print("Comparing two Just objects")
+    return from_just(self) == from_just(other)
+
+
+@Just.__eq__.register
+def _(self, other: Nothing) -> bool:
+    print("Comparing Just and Nothing")
+    return False
+
+
+@Nothing.__eq__.register
+def _(self, other: Just) -> bool:
+    return False
+
+
+@Nothing.__eq__.register
+def _(self, other: Nothing) -> bool:
+    return True
 
 
 @singledispatch
@@ -66,3 +73,4 @@ def _(m: Just, f: callable, default_value: any) -> any:
 @maybe.register
 def _(m: Nothing, f: callable, default_value: any) -> any:
     return default_value
+
