@@ -101,3 +101,11 @@ def test_cat_maybes():
 
 def test_map_maybes():
     assert mapMaybes(lambda x: Just(x), [1, 2, 3]) == [1, 2, 3]
+
+    def bigger_than_ten(x):
+        if x > 10:
+            return Just(x)
+        else:
+            return Nothing
+
+    assert mapMaybes(bigger_than_ten, [5, 10, 11, 15, -3]) == [11, 15]
