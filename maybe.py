@@ -37,7 +37,7 @@ Nothing = _Nothing()
 @Just.__eq__.register
 def _(self, other: Just) -> bool:
     print("Comparing two Just objects")
-    return from_just(self) == from_just(other)
+    return fromJust(self) == fromJust(other)
 
 
 @Just.__eq__.register
@@ -57,18 +57,23 @@ def _(self, other: _Nothing) -> bool:
 
 
 @singledispatch
-def maybe(m, f, default_value):
+def _maybe(m, f, default_value):
     raise TypeError("Call with Maybe value")
 
 
-@maybe.register
+@_maybe.register
 def _(m: Just, f: callable, default_value: any) -> any:
-    return f(from_just(m))
+    return f(fromJust(m))
 
 
-@maybe.register
+@_maybe.register
 def _(m: _Nothing, f: callable, default_value: any) -> any:
     return default_value
+
+
+# Move parameters around
+def maybe(default_value, f, m):
+    return _maybe(m, f, default_value)
 
 
 @singledispatch
@@ -102,11 +107,11 @@ def _(_: _Nothing) -> bool:
 
 
 @singledispatch
-def from_just(x):
+def fromJust(x):
     raise TypeError("Use this on a Just object")
 
 
-@from_just.register
+@fromJust.register
 def _(x: Just) -> any:
     return x.value
 
@@ -118,7 +123,7 @@ def fromMaybe(x, default_value):
 
 @fromMaybe.register
 def _(m: Just, _) -> any:
-    return from_just(m)
+    return fromJust(m)
 
 
 @fromMaybe.register
@@ -146,7 +151,7 @@ def maybeToList(_):
 
 @maybeToList.register
 def _(m: Just) -> list:
-    return [from_just(m)]
+    return [fromJust(m)]
 
 
 @maybeToList.register
@@ -163,11 +168,11 @@ def catMaybes(_):
 def _(m: list) -> List[any]:
     """Not ideal but cannot specify a list of Maybes"""
     try:
-        return [from_just(x) for x in m if isJust(x)]
+        return [fromJust(x) for x in m if isJust(x)]
     except TypeError:
         raise TypeError("Please run on a list of Maybes")
 
 
-def mapMaybes(f: Callable[any, maybe], x: List[any]) -> List[any]:
+def mapMaybes(f: Callable[any, Maybe], x: List[any]) -> List[any]:
     output: List[Maybe] = [f(y) for y in x]
     return catMaybes(output)

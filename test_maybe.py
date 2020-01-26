@@ -6,13 +6,13 @@ from maybe import *
 
 
 def test_maybe_applied_to_just_returns_executed_function():
-    assert maybe(Just(5), lambda x: x * 2, 1) == 10
-    assert maybe(Just([1, 2, 3, 4, 5]), lambda x: x[3:], 0) == [4, 5]
+    assert maybe(1, lambda x: x * 2, Just(5)) == 10
+    assert maybe(0, lambda x: x[3:], Just([1, 2, 3, 4, 5])) == [4, 5]
 
 
 def test_maybe_applied_to_nothing_returns_default():
-    assert maybe(Nothing, lambda x: x * 2, 1) == 1
-    assert maybe(Nothing, lambda x: x[3:], 0) == 0
+    assert maybe(1, lambda x: x * 2, Nothing) == 1
+    assert maybe(0, lambda x: x[3:], Nothing) == 0
 
 
 def test_just_values_are_equal():
@@ -58,15 +58,15 @@ def test_is_just_with_nothing_returns_true():
 
 
 def test_from_just_value_is_value():
-    assert from_just(Just(5)) == 5
-    assert from_just(Just("A string")) == "A string"
-    assert from_just(Just(Nothing)) == Nothing
-    assert 2 * from_just(Just(10)) == 20
+    assert fromJust(Just(5)) == 5
+    assert fromJust(Just("A string")) == "A string"
+    assert fromJust(Just(Nothing)) == Nothing
+    assert 2 * fromJust(Just(10)) == 20
 
 
 def test_from_just_nothing_raises_error():
     with pytest.raises(TypeError):
-        from_just(Nothing)
+        fromJust(Nothing)
 
 
 def test_from_maybe_returns_inner_value_when_just():
