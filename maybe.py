@@ -21,13 +21,17 @@ class Just(Maybe):
         raise TypeError("Use with Maybe objects")
 
 
-class Nothing(Maybe):
+class _Nothing(Maybe):
     def __repr__(self):
         return "Nothing"
 
     @singledispatchmethod
     def __eq__(self, x):
         raise TypeError("Use with Maybe objects")
+
+
+# Create common instance
+Nothing = _Nothing()
 
 
 @Just.__eq__.register
@@ -37,18 +41,18 @@ def _(self, other: Just) -> bool:
 
 
 @Just.__eq__.register
-def _(self, other: Nothing) -> bool:
+def _(self, other: _Nothing) -> bool:
     print("Comparing Just and Nothing")
     return False
 
 
-@Nothing.__eq__.register
+@_Nothing.__eq__.register
 def _(self, other: Just) -> bool:
     return False
 
 
-@Nothing.__eq__.register
-def _(self, other: Nothing) -> bool:
+@_Nothing.__eq__.register
+def _(self, other: _Nothing) -> bool:
     return True
 
 
@@ -63,7 +67,7 @@ def _(m: Just, f: callable, default_value: any) -> any:
 
 
 @maybe.register
-def _(m: Nothing, f: callable, default_value: any) -> any:
+def _(m: _Nothing, f: callable, default_value: any) -> any:
     return default_value
 
 
@@ -78,7 +82,7 @@ def _(m: Just) -> bool:
 
 
 @isJust.register
-def _(m: Nothing) -> bool:
+def _(m: _Nothing) -> bool:
     return False
 
 
@@ -93,7 +97,7 @@ def _(_: Just) -> bool:
 
 
 @isNothing.register
-def _(_: Nothing) -> bool:
+def _(_: _Nothing) -> bool:
     return True
 
 
@@ -118,7 +122,7 @@ def _(m: Just, _) -> any:
 
 
 @fromMaybe.register
-def _(_: Nothing, default_value: any) -> any:
+def _(_: _Nothing, default_value: any) -> any:
     return default_value
 
 
@@ -132,7 +136,7 @@ def _(l: list) -> Maybe:
     if len(l) >= 1:
         return Just(l[0])
     else:
-        return Nothing()
+        return Nothing
 
 
 @singledispatch
@@ -146,7 +150,7 @@ def _(m: Just) -> list:
 
 
 @maybeToList.register
-def _(m: Nothing) -> list:
+def _(m: _Nothing) -> list:
     return []
 
 
